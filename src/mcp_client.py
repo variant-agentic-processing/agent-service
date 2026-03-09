@@ -51,7 +51,7 @@ def _identity_token(audience: str) -> str | None:
 async def mcp_session() -> AsyncIterator[ClientSession]:
     """Open an authenticated MCP session for the duration of the block."""
     base_url = os.environ.get("MCP_SERVER_URL", "").rstrip("/")
-    url = f"{base_url}/mcp"
+    url = f"{base_url}/mcp/"
 
     token = _identity_token(base_url)
     auth = _BearerAuth(token) if token else None
