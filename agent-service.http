@@ -1,0 +1,96 @@
+# agent-service — REST Client test file
+# https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+#
+# @local  — uvicorn running locally (poetry run uvicorn src.main:app --reload --port 8080)
+# @deploy — Cloud Run internal URL (must be on VPN)
+
+@local = http://localhost:8080
+@deploy = https://agent-service-fno64g2krq-uc.a.run.app
+@base = {{deploy}}
+
+# Change @base to {{deploy}} to hit the live service
+
+
+### Health check — also shows how many MCP tools were discovered
+GET {{base}}/health
+
+
+### Ask — what pathogenic variants does HG002 have in BRCA2?
+POST {{base}}/query
+Content-Type: application/json
+
+{
+  "question": "What pathogenic variants does HG002 have in BRCA1 or BRCA2?"
+}
+
+
+### Ask — individual summary
+POST {{base}}/query
+Content-Type: application/json
+
+{
+  "question": "Give me a summary of HG002's variant burden"
+}
+
+
+### Ask — cross-individual cohort question
+POST {{base}}/query
+Content-Type: application/json
+
+{
+  "question": "How many individuals in this dataset carry a pathogenic variant in TP53?"
+}
+
+
+### Ask — aggregate by consequence
+POST {{base}}/query
+Content-Type: application/json
+
+{
+  "question": "What are the most common consequence types for EGFR variants across the cohort?"
+}
+
+
+### Ask — gene list query
+POST {{base}}/query
+Content-Type: application/json
+
+{
+  "question": "Does HG002 have any variants in genes associated with hereditary breast cancer?"
+}
+
+
+### Ask — locus query
+POST {{base}}/query
+Content-Type: application/json
+
+{
+  "question": "Are there any stop-gained variants on chr17 between position 7500000 and 7600000?"
+}
+
+
+### Ask — multi-hop query
+POST {{base}}/query
+Content-Type: application/json
+
+{
+  "question": "Find individuals who share pathogenic variants in the same gene as HG002's BRCA2 findings, and tell me what those variants are."
+}
+
+
+### Ask — self-orientation test (wrong field value)
+POST {{base}}/query
+Content-Type: application/json
+
+{
+  "question": "Show me variants with clinical_significance = 'dangerous'"
+}
+
+
+### Ask — out-of-scope test
+POST {{base}}/query
+Content-Type: application/json
+
+{
+  "question": "What is the treatment protocol for BRCA2 mutations?"
+}
