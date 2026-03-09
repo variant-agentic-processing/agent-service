@@ -1,0 +1,4 @@
+config:
+  agent-service:project_id: variant-processing
+  agent-service:region: us-central1
+  agent-service:image_tag: latest

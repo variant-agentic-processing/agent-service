@@ -1,0 +1,47 @@
+[tool.poetry]
+name = "agent-service"
+version = "0.1.0"
+description = "Agent API — Claude reasoning loop over the MCP variant server"
+authors = ["variant-agentic-processing"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = ">=0.115.0"
+uvicorn = { extras = ["standard"], version = ">=0.30.0" }
+anthropic = ">=0.49.0"
+mcp = ">=1.6.0"
+google-cloud-secret-manager = ">=2.20.0"
+google-auth = ">=2.28.0"
+pydantic = ">=2.7.0"
+python-dotenv = "^1.2.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = ">=8.0.0"
+pytest-asyncio = ">=0.23.0"
+httpx = ">=0.27.0"
+poethepoet = ">=0.25.0"
+ruff = ">=0.4.0"
+pulumi = ">=3.0.0"
+pulumi-gcp = ">=7.0.0"
+
+[tool.poe]
+envfile = ".env"
+
+[tool.poe.tasks]
+test    = "pytest tests/ -v"
+lint    = "ruff check src/ tests/"
+build   = "bash scripts/build_image.sh"
+logs    = { shell = "gcloud run services logs read agent-service --region=us-central1 --project=${GCP_PROJECT} --limit=50" }
+login   = { script = "scripts.login:main" }
+ask     = { script = "scripts.ask:main" }
+stack-init = { shell = "cd deploy && pulumi stack init dev" }
+deploy  = { shell = "cd deploy && pulumi up --yes" }
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
