@@ -14,12 +14,6 @@ logger = logging.getLogger(__name__)
 MAX_RESULT_CHARS = 8000
 
 
-def _mcp_url() -> str:
-    url = os.environ.get("MCP_SERVER_URL", "").rstrip("/")
-    if not url:
-        raise RuntimeError("MCP_SERVER_URL is not set")
-    return f"{url}/mcp"
-
 
 def _identity_token(audience: str) -> str | None:
     """Fetch an OIDC identity token for the given audience.
@@ -46,7 +40,7 @@ def _identity_token(audience: str) -> str | None:
 async def mcp_session() -> AsyncIterator[ClientSession]:
     """Open an authenticated MCP session for the duration of the block."""
     base_url = os.environ.get("MCP_SERVER_URL", "").rstrip("/")
-    url = f"{base_url}/mcp"
+    url = f"{base_url}/mcp/"
 
     headers: dict[str, str] = {}
     token = _identity_token(base_url)
