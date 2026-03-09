@@ -6,7 +6,7 @@
 
 @local = http://localhost:8080
 @deploy = https://agent-service-fno64g2krq-uc.a.run.app
-@base = {{local}}
+@base = {{deploy}}
 
 # Change @base to {{deploy}} to hit the live service
 

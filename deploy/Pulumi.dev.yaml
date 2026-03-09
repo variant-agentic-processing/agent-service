@@ -2,3 +2,4 @@ config:
   agent-service:project_id: variant-processing
   agent-service:region: us-central1
   agent-service:image_tag: latest
+encryptionsalt: v1:TTsCOxc8Rjg=:v1:6ToDGE73jckdj9Ou:E5mBxCN6vuSrauavDG+XpdD1Ax2SSQ==
