@@ -5,6 +5,7 @@ import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
+import httpx
 from mcp import ClientSession
 from mcp.client.streamable_http import streamablehttp_client
 from mcp.types import Tool
@@ -14,12 +15,22 @@ logger = logging.getLogger(__name__)
 MAX_RESULT_CHARS = 8000
 
 
+class _BearerAuth(httpx.Auth):
+    """httpx Auth that re-applies a Bearer token on every request, including after redirects."""
+
+    def __init__(self, token: str) -> None:
+        self._token = token
+
+    def auth_flow(self, request: httpx.Request):
+        request.headers["Authorization"] = f"Bearer {self._token}"
+        yield request
+
 
 def _identity_token(audience: str) -> str | None:
     """Fetch an OIDC identity token for the given audience.
 
     Works on Cloud Run (GCE metadata server) and locally via ADC.
-    Returns None if unavailable so callers can skip the auth header.
+    Returns None if unavailable so callers can proceed without auth.
     """
     token_override = os.environ.get("MCP_IDENTITY_TOKEN")
     if token_override:
@@ -40,14 +51,12 @@ def _identity_token(audience: str) -> str | None:
 async def mcp_session() -> AsyncIterator[ClientSession]:
     """Open an authenticated MCP session for the duration of the block."""
     base_url = os.environ.get("MCP_SERVER_URL", "").rstrip("/")
-    url = f"{base_url}/mcp/"
+    url = f"{base_url}/mcp"
 
-    headers: dict[str, str] = {}
     token = _identity_token(base_url)
-    if token:
-        headers["Authorization"] = f"Bearer {token}"
+    auth = _BearerAuth(token) if token else None
 
-    async with streamablehttp_client(url, headers=headers) as (read, write, _):
+    async with streamablehttp_client(url, auth=auth) as (read, write, _):
         async with ClientSession(read, write) as session:
             await session.initialize()
             yield session
