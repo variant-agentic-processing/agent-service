@@ -12,7 +12,7 @@ from mcp.types import Tool
 
 logger = logging.getLogger(__name__)
 
-MAX_RESULT_CHARS = 8000
+MAX_RESULT_CHARS = 24000
 
 
 class _BearerAuth(httpx.Auth):

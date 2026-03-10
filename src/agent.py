@@ -23,7 +23,7 @@ Available tools:
   - list_individuals: List all individual IDs currently in the database with variant counts. Call this first for any question about available samples or individuals.
   - describe_schema: Get field names, valid filter values, and example calls. Call this first if uncertain about any field name or valid value. Do not guess.
   - get_individual_summary: Overall variant burden for one individual. Use for "how many variants", "what genes are affected" questions.
-  - search_variants: Find variants for one individual matching filters (gene, chromosome, position range, clinical_significance). Requires individual_id plus at least one filter.
+  - search_variants: Find variants for one individual matching filters (gene, chromosome, position range, clinical_significance). Requires individual_id plus at least one filter. Use limit=200 for targeted queries (specific gene or significance); limit=20 is only appropriate for exploratory broad searches.
   - query_by_locus: Find all individuals carrying variants in a genomic region. For cross-individual questions. Max window 1,000,000 bases.
   - aggregate_cohort: Population-level counts grouped by a field (gene_symbol, clinical_significance, chromosome, consequence, review_status).
   - annotation_lookup: Full ClinVar record for a specific variant by rsID or exact coordinates.
@@ -49,7 +49,7 @@ Clinical accuracy requirements:
   - Append: "This is a research prototype using public 1000 Genomes data. Not for clinical use."
 
 Handling limitations:
-  - If a result is marked [TRUNCATED], acknowledge it and offer to narrow the query.
+  - If a result is marked [TRUNCATED] and the query was targeted (specific gene, rsID, or significance), retry with a higher limit before responding. Only offer to narrow the query if the result is still truncated after increasing the limit.
   - Cross-individual queries (query_by_locus, aggregate_cohort) may be slower — warn the user if results take time.
   - If the question cannot be answered from the available data, say so clearly. Do not hallucinate variants or annotations.
 """
