@@ -5,6 +5,7 @@ import logging
 import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from typing import Literal
 
 from dotenv import load_dotenv  # noqa: E402
 
@@ -43,13 +44,19 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="agent-service", version="0.1.0", lifespan=lifespan)
 
 
+class Message(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str
+
+
 class QueryRequest(BaseModel):
-    question: str
+    messages: list[Message]
+    context: str | None = None
 
 
-async def _stream_events(question: str, tools_schemas: list, anthropic_client, model: str) -> AsyncIterator[str]:
+async def _stream_events(messages: list[dict], context: str | None, tools_schemas: list, anthropic_client, model: str) -> AsyncIterator[str]:
     try:
-        async for event in agent.run(question, tools_schemas, anthropic_client, model):
+        async for event in agent.run(messages, tools_schemas, anthropic_client, model, context):
             yield f"data: {json.dumps(event)}\n\n"
     except Exception as exc:
         logger.exception("Agent run failed")
@@ -60,12 +67,15 @@ async def _stream_events(question: str, tools_schemas: list, anthropic_client, m
 
 @app.post("/query")
 async def query(req: QueryRequest):
-    if not req.question.strip():
-        raise HTTPException(status_code=400, detail="question must not be empty")
+    if not req.messages or not any(m.role == "user" for m in req.messages):
+        raise HTTPException(status_code=400, detail="messages must contain at least one user message")
+
+    messages = [m.model_dump() for m in req.messages]
 
     return StreamingResponse(
         _stream_events(
-            req.question,
+            messages,
+            req.context,
             app.state.tools_schemas,
             app.state.anthropic_client,
             app.state.model,

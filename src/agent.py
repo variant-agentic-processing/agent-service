@@ -56,13 +56,15 @@ Handling limitations:
 
 
 async def run(
-    question: str,
+    messages: list[dict],
     tools_schemas: list[dict],
     anthropic_client: anthropic.AsyncAnthropic,
     model: str,
+    context: str | None = None,
 ) -> AsyncIterator[dict[str, Any]]:
     """Run the agent reasoning loop. Yields SSE-compatible event dicts."""
-    messages: list[dict] = [{"role": "user", "content": question}]
+    system = SYSTEM_PROMPT + f"\n\n{context}" if context else SYSTEM_PROMPT
+    messages = list(messages)  # don't mutate caller's list
 
     async with mcp_session() as session:
         for iteration in range(MAX_ITERATIONS):
@@ -71,7 +73,7 @@ async def run(
             response = await anthropic_client.messages.create(
                 model=model,
                 max_tokens=4096,
-                system=SYSTEM_PROMPT,
+                system=system,
                 messages=messages,
                 tools=tools_schemas,
             )

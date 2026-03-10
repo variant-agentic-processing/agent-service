@@ -16,9 +16,9 @@ def test_truncate_result_short():
 
 
 def test_truncate_result_long():
-    long = "x" * 9000
+    long = "x" * 25000
     result = truncate_result(long)
-    assert len(result) <= 8100
+    assert len(result) <= 24100
     assert "[TRUNCATED" in result
 
 
@@ -85,7 +85,7 @@ async def test_agent_no_tool_calls():
 
     with patch("src.agent.mcp_session", return_value=mock_session):
         events = []
-        async for event in agent.run("How many variants?", [], mock_client, "claude-sonnet-4-6"):
+        async for event in agent.run([{"role": "user", "content": "How many variants?"}], [], mock_client, "claude-sonnet-4-6"):
             events.append(event)
 
     answer_events = [e for e in events if e["type"] == "answer"]
@@ -116,7 +116,7 @@ async def test_agent_one_tool_call():
 
     with patch("src.agent.mcp_session", return_value=mock_session):
         events = []
-        async for event in agent.run("Summarise HG002", [], mock_client, "claude-sonnet-4-6"):
+        async for event in agent.run([{"role": "user", "content": "Summarise HG002"}], [], mock_client, "claude-sonnet-4-6"):
             events.append(event)
 
     types = [e["type"] for e in events]
@@ -148,9 +148,41 @@ async def test_agent_tool_error_continues():
 
     with patch("src.agent.mcp_session", return_value=mock_session):
         events = []
-        async for event in agent.run("BRCA1 variants in HG002", [], mock_client, "claude-sonnet-4-6"):
+        async for event in agent.run([{"role": "user", "content": "BRCA1 variants in HG002"}], [], mock_client, "claude-sonnet-4-6"):
             events.append(event)
 
     result_events = [e for e in events if e["type"] == "tool_result"]
     assert result_events[0]["is_error"] is True
+    assert any(e["type"] == "answer" for e in events)
+
+
+@pytest.mark.asyncio
+async def test_agent_context_appended_to_system_prompt():
+    """Context string is appended to the system prompt when provided."""
+    from src import agent
+
+    mock_client = AsyncMock()
+    mock_client.messages.create = AsyncMock(
+        return_value=_make_response([_make_text_block("Answer scoped to individual.")])
+    )
+
+    mock_session = AsyncMock()
+    mock_session.__aenter__ = AsyncMock(return_value=mock_session)
+    mock_session.__aexit__ = AsyncMock(return_value=False)
+
+    context = "The user is viewing individual HG00096."
+
+    with patch("src.agent.mcp_session", return_value=mock_session):
+        events = []
+        async for event in agent.run(
+            [{"role": "user", "content": "Summarise this individual"}],
+            [],
+            mock_client,
+            "claude-sonnet-4-6",
+            context=context,
+        ):
+            events.append(event)
+
+    call_kwargs = mock_client.messages.create.call_args.kwargs
+    assert context in call_kwargs["system"]
     assert any(e["type"] == "answer" for e in events)
