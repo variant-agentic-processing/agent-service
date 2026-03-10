@@ -13,6 +13,6 @@ gcloud builds submit \
   .
 
 echo "==> Updating Pulumi image_tag to ${TAG}"
-(cd "$(dirname "$0")/../deploy" && pulumi config set image_tag "${TAG}")
+(cd "$(dirname "$0")/../deploy" && pulumi config set --stack dev image_tag "${TAG}")
 
 echo "==> Done: ${IMAGE}"
