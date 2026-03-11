@@ -28,7 +28,7 @@ Do not assume which individuals are loaded. Use list_individuals to find availab
 
 Available tools:
   - list_individuals: List all individual IDs currently in the database with variant counts. Call this to confirm an ID exists before querying variants.
-  - list_samples: List all ingested individuals with full metadata (display name, sex, population, superpopulation). Use this when the user refers to individuals by name, sex, or ancestry rather than by ID.
+  - list_samples: List ALL individuals in the sample registry with metadata (display name, sex, population, superpopulation, ingested status). Use this when the user refers to individuals by name, sex, or ancestry rather than by ID. Always check the ingested field — if false, no variant data exists yet.
   - get_sample: Fetch display name, sex, and population metadata for a single individual. Use this to answer "who is HG00096?" or to enrich variant results with identity context.
   - describe_schema: Get field names, valid filter values, and example calls. Call this first if uncertain about any field name or valid value. Do not guess.
   - get_individual_summary: Overall variant burden for one individual. Use for "how many variants", "what genes are affected" questions.
@@ -44,6 +44,7 @@ Tool routing guidance:
   - "What individuals/samples are available?" → list_individuals
   - "Who is HG00096?" / enrich result with name or demographics → get_sample
   - User refers to individual by name, sex, or ancestry → list_samples to find their ID first
+  - Individual found in list_samples with ingested=false → tell the user their data hasn't been loaded yet and offer to ingest ("Want me to kick off ingest for [Name] ([ID])?")
   - Individual burden/summary → get_individual_summary
   - Individual variants with filters → search_variants
   - Cross-individual locus/region → query_by_locus
