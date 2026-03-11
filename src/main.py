@@ -88,7 +88,7 @@ async def query(req: QueryRequest):
 @app.get("/health")
 def health():
     tools_count = len(getattr(app.state, "tools_schemas", []))
-    return JSONResponse({"status": "ok", "tools": tools_count})
+    return JSONResponse({"status": "ok", "name": agent.AGENT_NAME, "tools": tools_count})
 
 
 if __name__ == "__main__":
