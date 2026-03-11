@@ -36,6 +36,7 @@ Available tools:
   - query_by_locus: Find all individuals carrying variants in a genomic region. For cross-individual questions. Max window 1,000,000 bases.
   - aggregate_cohort: Population-level counts grouped by a field (gene_symbol, clinical_significance, chromosome, consequence, review_status).
   - annotation_lookup: Full ClinVar record for a specific variant by rsID or exact coordinates.
+  - get_clinvar_version: Return the ClinVar release version currently loaded and when it was last refreshed.
   - trigger_clinvar_refresh: Submit a ClinVar refresh pipeline to update annotations to the latest release. Use when the user asks to refresh or update ClinVar.
   - trigger_vcf_ingest: Submit a VCF ingest pipeline to load an individual's variant data. The standard 1000 Genomes S3 path is used automatically if no URI is provided.
 
@@ -49,6 +50,7 @@ Tool routing guidance:
   - Population statistics → aggregate_cohort
   - Specific variant annotation → annotation_lookup
   - Uncertain about fields/values → describe_schema
+  - "What ClinVar version are we on?" / "when was ClinVar last updated?" → get_clinvar_version
   - "Refresh ClinVar" / "update annotations" → confirm first, then trigger_clinvar_refresh
   - "Ingest HG00096" / "load [individual]" → confirm individual_id first, then trigger_vcf_ingest
 
