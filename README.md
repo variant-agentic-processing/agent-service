@@ -14,7 +14,7 @@ All routes are open within the VPN — no API key required. The VPN and Cloud Ru
 - `mcp-variant-server` deployed and reachable (internal Cloud Run URL)
 - Anthropic API key stored in Secret Manager as `anthropic-api-key` (or set `ANTHROPIC_API_KEY` in `.env`)
 - VPN connected before working with the deployed service
-- `genomic-pipeline` Artifact Registry repository exists
+- `genomic-pipeline` Artifact Registry repository exists- [poethepoet](https://github.com/nat-n/poethepoet) — task runner (`pipx install poethepoet`)
 
 ## Setup
 
@@ -47,7 +47,7 @@ poetry run uvicorn src.main:app --reload --port 8080
 Ask a question via CLI:
 
 ```bash
-poetry run poe ask -- --question "What pathogenic variants does HG002 have in BRCA2?"
+poe ask -- --question "What pathogenic variants does HG002 have in BRCA2?"
 ```
 
 Or use `agent-service.http` with the REST Client VS Code extension.
@@ -57,7 +57,7 @@ Or use `agent-service.http` with the REST Client VS Code extension.
 Builds the Docker image via Cloud Build and pushes to Artifact Registry:
 
 ```bash
-poetry run poe build
+poe build
 ```
 
 ## Deploy
@@ -65,28 +65,28 @@ poetry run poe build
 First time only — log in and initialise the stack:
 
 ```bash
-poetry run poe login
-poetry run poe stack-init
+poe login
+poe stack-init
 ```
 
 Then deploy (and on all subsequent updates):
 
 ```bash
-poetry run poe deploy
+poe deploy
 ```
 
 ## Poe tasks
 
 | Task | Description |
 |------|-------------|
-| `poetry run poe build` | Build and push Docker image via Cloud Build |
-| `poetry run poe login` | Log into the Pulumi GCS backend |
-| `poetry run poe stack-init` | Initialise the Pulumi stack (first time only) |
-| `poetry run poe deploy` | Deploy or update the Cloud Run service via Pulumi |
-| `poetry run poe ask` | Ask a question via CLI (pass `-- --question "..."`) |
-| `poetry run poe test` | Run unit tests |
-| `poetry run poe lint` | Run ruff linter |
-| `poetry run poe logs` | Tail Cloud Run logs |
+| `poe build` | Build and push Docker image via Cloud Build |
+| `poe login` | Log into the Pulumi GCS backend |
+| `poe stack-init` | Initialise the Pulumi stack (first time only) |
+| `poe deploy` | Deploy or update the Cloud Run service via Pulumi |
+| `poe ask` | Ask a question via CLI (pass `-- --question "..."`) |
+| `poe test` | Run unit tests |
+| `poe lint` | Run ruff linter |
+| `poe logs` | Tail Cloud Run logs |
 
 ## Project structure
 
