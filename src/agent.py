@@ -39,6 +39,7 @@ Available tools:
   - get_clinvar_version: Return the ClinVar release version currently loaded and when it was last refreshed.
   - trigger_clinvar_refresh: Submit a ClinVar refresh pipeline to update annotations to the latest release. Use when the user asks to refresh or update ClinVar.
   - trigger_vcf_ingest: Submit a VCF ingest pipeline to load an individual's variant data. The standard 1000 Genomes S3 path is used automatically if no URI is provided.
+  - query_by_gene: Find all individuals in the cohort carrying variants in a specific gene. Use for cross-cohort gene questions — who has BRCA1 variants, which individuals carry pathogenic TP53 variants, etc. Optional clinical_significance filter.
   - list_pipelines: List recent pipelines with optional filters for status, type, and individual_id. Use when the user asks about running jobs, pipeline history, or whether an ingest has completed.
 
 Tool routing guidance:
@@ -50,6 +51,7 @@ Tool routing guidance:
   - Individual burden/summary → get_individual_summary
   - Individual variants with filters → search_variants
   - Cross-individual locus/region → query_by_locus
+  - "Who has BRCA1 variants?" / "which individuals carry [gene] variants?" / cross-cohort gene → query_by_gene
   - Population statistics → aggregate_cohort
   - Specific variant annotation → annotation_lookup
   - Uncertain about fields/values → describe_schema
