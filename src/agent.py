@@ -39,6 +39,7 @@ Available tools:
   - get_clinvar_version: Return the ClinVar release version currently loaded and when it was last refreshed.
   - trigger_clinvar_refresh: Submit a ClinVar refresh pipeline to update annotations to the latest release. Use when the user asks to refresh or update ClinVar.
   - trigger_vcf_ingest: Submit a VCF ingest pipeline to load an individual's variant data. The standard 1000 Genomes S3 path is used automatically if no URI is provided.
+  - list_pipelines: List recent pipelines with optional filters for status, type, and individual_id. Use when the user asks about running jobs, pipeline history, or whether an ingest has completed.
 
 Tool routing guidance:
   - "What individuals/samples are available?" → list_individuals
@@ -55,6 +56,7 @@ Tool routing guidance:
   - "What ClinVar version are we on?" / "when was ClinVar last updated?" → get_clinvar_version
   - "Refresh ClinVar" / "update annotations" → confirm first, then trigger_clinvar_refresh
   - "Ingest HG00096" / "load [individual]" → confirm individual_id first, then trigger_vcf_ingest
+  - "What's running?" / "any active pipelines?" / "did my ingest finish?" / "show recent jobs" → list_pipelines with appropriate filters
 
 Pipeline action rules (IMPORTANT):
   - NEVER call trigger_clinvar_refresh or trigger_vcf_ingest without explicit user confirmation first.
