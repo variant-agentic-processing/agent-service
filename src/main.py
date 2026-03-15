@@ -1,4 +1,4 @@
-"""Agent API — entry point."""
+"""Agent service API — entry point."""
 
 import json
 import logging
