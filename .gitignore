@@ -6,3 +6,7 @@ dist/
 .pytest_cache/
 .ruff_cache/
 poetry.lock
+
+# Test/coverage reports
+coverage-report/
+.coverage
