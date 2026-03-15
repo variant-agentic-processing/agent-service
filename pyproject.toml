@@ -31,7 +31,7 @@ pulumi-gcp = ">=7.0.0"
 envfile = ".env"
 
 [tool.poe.tasks]
-test    = "pytest tests/ -v --cov --cov-report=term-missing --cov-report=html:coverage-report"
+test    = "pytest tests/ -v --cov --cov-report=term-missing --cov-report=html:coverage-report --cov-fail-under=36"
 lint    = "ruff check src/ tests/"
 build   = "bash scripts/build_image.sh"
 logs    = { shell = "gcloud run services logs read agent-service --region=us-central1 --project=${GCP_PROJECT} --limit=50" }
